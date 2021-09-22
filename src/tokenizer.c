@@ -1,6 +1,6 @@
-#include "tokenizer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "tokenizer.h"
 
 /* Return true (non-zero if c is a whitespace character
    ('\t' or ' ').
@@ -30,7 +30,6 @@ char *word_start(char *str)
     return p;
   }
   str--;
-  // FIXME: HOW TO RETURN A ZERO POINTER?????
   return str;
 }
 
@@ -38,9 +37,6 @@ char *word_start(char *str)
 char *word_terminator(char *word)
 {
   while(non_space_char(*word++));
-  if(*word == '\0') {
-    return word;
-  }
   word--;
   return word;
 }
@@ -62,10 +58,11 @@ int count_words(char *str)
    containing <len> chars from <inStr> */
 char *copy_str(char *inStr, short len)
 {
-  char *copy;
-  copy = (char *) malloc(len+1);
-  int i = 0;
-  for (i = 0; i < len && (copy[i] = inStr[i]) != '\0'; i++); 
+  char *copy = (char *) malloc((len + 1) * sizeof(char));
+  int i;
+  for (i = 0; i < len && inStr[i] != '\0'; i++) {
+    copy[i] = inStr[i];
+  }
   copy[i] = '\0';
   return copy;
 }
@@ -86,32 +83,35 @@ char *copy_str(char *inStr, short len)
 char **tokenize(char* str)
 {
   int num_words = count_words(str);
-  char **p;
-  p = (char *) malloc(num_words + 1(char *));
+  char **p = (char **) malloc((num_words + 1) * sizeof(char));
 
-  for(int i = 0; i < num_words; i++) {
-    // measure word
+  int i;
+  for(i = 0; i < num_words; i++) {
     str = word_start(str);
-    // COMPUTE SIZE
-    //
-    int word_length = 5;
-    // copy the word
-    //p[i] = malloc(word_length +1);
-    p[i] = copy_str(str, word_length);
+    p[i] = copy_str(str, word_terminator(str) - str);
     str = word_terminator(str);
   }
-  printf("%d\n", num_words);
-  for(int l = 0; l < num_words; l++) {
-    printf("%s\n", p[l]);
-  }
+  p[i] = copy_str('\0', 0);
   return p;
 }
 
+/* Prints all tokens. */
 void print_tokens(char **tokens)
 {
+  while (**tokens != '\0') {
+    printf("%s\n", *tokens);
+    tokens++;
+  }
 }
 
+/* Frees all tokens and the vector containing them. */
 void free_tokens(char **tokens)
 {
+  int i = 0;
+  while (*tokens[i] != '\0') {
+    free(tokens[i]);
+    i++;
+  }
+  free(tokens);
 } 
 
