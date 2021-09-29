@@ -7,7 +7,7 @@
    Zero terminators are not printable (therefore false) */
 int space_char(char c)
 {
-  return ((c == '\t' || c == ' ') && c != '\0') ? 1 : 0;
+  return ((c == '\t' || c == ' ')) ? 1 : 0;
 }
 
 /* Return true (non-zero) if c is a non-whitespace
@@ -46,7 +46,7 @@ int count_words(char *str)
 {
   int count = 0;
   str = word_start(str);
-  while (str && *str) {
+  while (str) {
     count++;
     str = word_terminator(str);
     str = word_start(str);
@@ -83,35 +83,42 @@ char *copy_str(char *inStr, short len)
 char **tokenize(char* str)
 {
   int num_words = count_words(str);
-  char **p = (char **) malloc((num_words + 1) * sizeof(char));
+  char **tokens = (char **) malloc((num_words + 1) * sizeof(char));
 
   int i;
   for(i = 0; i < num_words; i++) {
     str = word_start(str);
-    p[i] = copy_str(str, word_terminator(str) - str);
+    tokens[i] = copy_str(str, word_terminator(str) - str);
     str = word_terminator(str);
   }
-  p[i] = copy_str('\0', 0);
-  return p;
+  char *empty = (char *) malloc(sizeof(char));
+  empty[0] = '\0';
+  tokens[i] = empty; 
+  return tokens;
 }
 
 /* Prints all tokens. */
 void print_tokens(char **tokens)
 {
-  while (**tokens != '\0') {
-    printf("%s\n", *tokens);
-    tokens++;
+  printf("---- Printing tokens ----\n");
+  int count = 0;
+  while (*tokens[count] != '\0') {
+    printf("[%d] %s\n", count+1, tokens[count]);
+    count++;
   }
+  printf("---- Done printing tokens ----\n");
 }
 
 /* Frees all tokens and the vector containing them. */
 void free_tokens(char **tokens)
 {
+  printf("---- Freeing tokens ----\n");
   int i = 0;
-  while (*tokens[i] != '\0') {
+  while (tokens[i] != NULL) {
     free(tokens[i]);
     i++;
   }
   free(tokens);
+  printf("---- Done freeing ----\n");
 } 
 
